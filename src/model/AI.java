@@ -49,7 +49,7 @@ public class AI extends Player {
     for ( Move move : board.getValidMoves() ) {
       Board copy = new Board (board);
       copy.makeMove ( move );
-      int score = -alphaBetaNegamax( copy, this.depth, Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1 );
+      int score = -alphaBetaPruning( copy, this.depth, Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1 );
       if ( score > bestScore ) {
 	bestScore = score;
 	bestMove = move;
@@ -97,4 +97,50 @@ public class AI extends Player {
   public boolean isHuman() {
     return false;
   }
+
+  /**
+   * <b>Alpha Beta Pruning </b><p>
+   *
+   * Utilises the Alpha Beta pruning w/ negamax to calculate the best move</p><p>
+   *
+   * This is normally called with  alphaBetaPruning(board, depth, +ve infinity, -ve infinity)
+   * The calling method handles the first move made by the AI.</p>
+   *
+   * @param board - board to evaluate and make next move on
+   * @param depth - how much further to traverse the tree before returning
+   * @param alpha
+   * @param beta
+   * @return Best move for a given board
+   */
+  public int alphaBetaPruning( Board board, int depth, int alpha, int beta ) {
+    
+    //Check if current move is checkmate, stalemate, or at max-depth -- returns the evaluation
+    if ( board.isCheckmate() ) {
+      return ( Integer.MIN_VALUE + 1 + this.depth - depth );
+    } else if ( board.isStalemate() ) {
+      return 0;
+    } else if ( depth <= 0 ) {
+      return ( evaluator.evaluate( board ) );
+    }
+
+    //Initializes value to minimum to start
+    int value = Integer.MIN_VALUE + 1;
+    
+    //Iterates over all possible moves 
+    for ( Move move : board.getValidMoves() ) {
+      Board next = new Board( board ); //next possible potential move
+      next.makeMove( move );
+      
+      //value uses -beta, -alpha because max(a,b)= -min(-a,-b) for two player games 
+      value = -alphaBetaPruning( next, depth - 1, -beta, -alpha );
+      
+      //Terminate if val >= beta
+      if ( value >= beta ) return ( value );
+      if ( value > alpha ) alpha = value;
+    }
+    System.out.println("Alpha: " + alpha + " Depth: " + depth);
+    return ( alpha );
+  }
+
 }
+
