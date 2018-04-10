@@ -22,6 +22,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import model.AI;
+import model.old_AI;
 import model.Board;
 import model.Human;
 import model.Move;
@@ -105,11 +106,14 @@ public final class MainWindow {
   private Themes myThemes = new Themes ();
   private ChessBoard myBoard = new ChessBoard (BOARDMINDIM,
       myThemes.getTheme (DEFAULT_THEME));
+
+
   // Model Board representation
+  // CHANGE WHO IS PLAYING TOGETHER HERE.
   private Board board;
   private Player p1 = new Human (PLAYER_ONE_DEFAULT_NAME, WHITE,
       DEFAULT_UNTIMED);
-  private Player p2 = new AI (DEFAULT_DEPTH, DEFAULT_EVALUATOR, BLACK,
+  private Player p2 = new old_AI (DEFAULT_DEPTH, DEFAULT_EVALUATOR, BLACK,
       PLAYER_TWO_DEFAULT_NAME, DEFAULT_UNTIMED);
 
   // Instances of all needed game objects
@@ -136,9 +140,9 @@ public final class MainWindow {
 
   /**
    * Main-Method to make class executable
-   * 
+   *
    * @param args
-   * 
+   *
    * @author A. Meikle, J. Schaeuble
    */
   public static void main(String[] args) {
@@ -147,7 +151,7 @@ public final class MainWindow {
 
   /**
    * <code>main</code> method builds the JayChess-window
-   * 
+   *
    * @param args
    *          standard
    * @author A. Meikle, J. Schaeuble
@@ -202,16 +206,17 @@ public final class MainWindow {
     frame.setVisible (true);
 
     // initialize the Players
-    ViewPlayer player1 = new ViewPlayer (PLAYER_ONE_DEFAULT_NAME,
-        DEFAULT_DEPTH, DEFAULT_EVALUATOR, true);
-    ViewPlayer player2 = new ViewPlayer (PLAYER_TWO_DEFAULT_NAME,
+    ViewPlayer player1 = new ViewPlayer ("og AI",
+        DEFAULT_DEPTH, DEFAULT_EVALUATOR, false);
+
+    ViewPlayer player2 = new ViewPlayer ("Josh's AI",
         DEFAULT_DEPTH, DEFAULT_EVALUATOR, false);
     initGame (player1, player2, DEFAULT_UNTIMED);
   }
 
   /**
    * generates the Menu as a JMenuBar
-   * 
+   *
    * @author A. Meikle, J. Schaeuble
    * @return JMenuBar containing the menu
    */
@@ -332,7 +337,7 @@ public final class MainWindow {
   /**
    * Creates a Panel that is shown right of the Board. It contains the previous
    * move list and the clock
-   * 
+   *
    * @return Panel on the right side of the board
    */
   private JPanel makeRightPanel() {
@@ -356,7 +361,7 @@ public final class MainWindow {
 
   /**
    * Creates the "current player" label and the "color indicator"
-   * 
+   *
    * @return JPanel containing the "current player" label
    */
   private JPanel createCurrentPlayerLabel() {
@@ -375,7 +380,7 @@ public final class MainWindow {
 
   /**
    * Sets the color of the currentPlayerColor
-   * 
+   *
    * @param color
    *          Color to be set (Black or White)
    */
@@ -387,7 +392,7 @@ public final class MainWindow {
 
   /**
    * Creates a panel that nests the move-history
-   * 
+   *
    * @return JPanel containing the move-history
    */
   private JPanel makeHistoryPanel() {
@@ -511,7 +516,7 @@ public final class MainWindow {
   /**
    * performs a move for a given player, distinguishes between Human and AI
    * players
-   * 
+   *
    * @param player
    *          Player to make a move.
    */
@@ -624,7 +629,7 @@ public final class MainWindow {
       synchronized (myThread) {
         myThread.pause ();
       }
-      
+
       return true;
     }
     else
@@ -633,7 +638,7 @@ public final class MainWindow {
 
   /**
    * displays messages in a dialog window
-   * 
+   *
    * @author Gary Blackwood
    * @param message
    *          to be displayed
@@ -646,7 +651,7 @@ public final class MainWindow {
    * Initializes a new game. Takes two ViewPlayer objects and the time remaining
    * Takes two ViewPlayer objects and the time remaining and constructs the new
    * AI objects
-   * 
+   *
    * @param player1
    * @param player2
    * @param timeRemaining
@@ -658,12 +663,12 @@ public final class MainWindow {
         myThread.pause ();
       }
     }
-    
+
     if ( player1.isHuman () ) {
       p1 = new Human (player1.getPlayerName (), WHITE, timeRemaining);
     }
     else {
-      p1 = new AI (player1.getPlayerDepthLevel (),
+      p1 = new old_AI (player1.getPlayerDepthLevel (),
           player1.getPlayerIntDifficulty (), WHITE, player1.getPlayerName (),
           timeRemaining);
     }
@@ -698,7 +703,7 @@ public final class MainWindow {
   /**
    * switches the current player to the given color, takes a byte representation
    * of the color (BLACK or WHITE)
-   * 
+   *
    * @param color
    */
   private void changeColorTo(byte color) {
@@ -723,7 +728,7 @@ public final class MainWindow {
   /**
    * Gets a Position object that represents the recently clicked point on the
    * board, returns null if the clicked position is not on the board
-   * 
+   *
    * @param xPos
    * @param yPos
    */
@@ -751,7 +756,7 @@ public final class MainWindow {
 
   /**
    * checks if there is a piece in the given color on the given position
-   * 
+   *
    * @param pos
    *          position to check for
    * @param color
@@ -768,7 +773,7 @@ public final class MainWindow {
 
   /**
    * A button listener for the "new game" item in the menu bar.
-   * 
+   *
    * @param evt
    *          void
    */
@@ -782,7 +787,7 @@ public final class MainWindow {
   /**
    * turns the mouseListener for Human input on the board representation on or
    * off depending on the given parameter
-   * 
+   *
    * @param b
    */
   private void followTheMouse(boolean b) {
@@ -1071,7 +1076,7 @@ public final class MainWindow {
   /**
    * generations the LinkedList containing possible/valid moves for the piece
    * set on the given Position
-   * 
+   *
    * @param positionToCheck
    */
   protected void buildHighlightPossible(Position positionToCheck) {
@@ -1105,7 +1110,7 @@ public final class MainWindow {
    * <code>ActionThread</code> extends Thread to build the game-thread that can
    * be stopped and restarted either at the end of a game/beginning of a new
    * game or by using the history panel to get back in the game history
-   * 
+   *
    */
   private class ActionThread extends Thread {
 
@@ -1133,7 +1138,7 @@ public final class MainWindow {
               e1.printStackTrace ();
             }
           }
-          
+
           if ( currentColor == WHITE ) {
             // ...let player one make a move
             makeAmove (p1);
@@ -1146,8 +1151,8 @@ public final class MainWindow {
 
         // while thread is not paused run the game: if currentColor is White...
 
-        
-        
+
+
       }
     }
 
